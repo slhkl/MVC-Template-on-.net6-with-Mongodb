@@ -11,10 +11,10 @@ namespace WebApp.Controllers
         public CategoryController(IConfiguration iConfig)
         {
             _configuration = iConfig;
-            DatabaseSetting databaseSetting = new DatabaseSetting(getValue("ConnectionString"), getValue("DatabaseName"), getValue("CollectionName"));
+            DatabaseSetting databaseSetting = new DatabaseSetting(GetValue("ConnectionString"), GetValue("DatabaseName"), GetValue("CollectionName"));
             _categoryServices = new CategoryServices(databaseSetting);
         }
-        public string getValue(string s)
+        public string GetValue(string s)
         {
             return _configuration.GetValue<string>("DatabaseSetting:" + s);
         }
