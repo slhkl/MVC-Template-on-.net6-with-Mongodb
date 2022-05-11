@@ -1,0 +1,70 @@
+﻿@model List<Category>?
+@{
+	ViewData["Title"] = "Index";
+}
+
+@if (TempData["success"] != null)
+{
+	<script src="~/lib/jquery/dist/jquery.min.js"> </script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	<script type="text/javascript">
+		toastr.success('@TempData["success"]')
+	</script>
+}
+
+<div class="container p-3">
+	<div class="row pt-4">
+		<div class="col-6">
+			<h2 class="text-primary">Category List</h2>
+		</div>
+		<div class="col-6 text-end">
+			<a asp-controller="Category" asp-action="Create" class="btn btn-primary">
+				<i class="bi bi-patch-plus"></i> &nbsp; Create New Category
+			</a>
+		</div>
+	</div>
+</div>
+<br />
+
+<table class="table table-bordered table-striped" style="width 100%">
+
+	<thead>
+		<tr>
+			<th>
+				Category Name
+			</th>
+			<th>
+				Display Order
+			</th>
+			<th>
+				Options
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var obj in Model)
+		{
+			<tr>
+				<td width="40%">
+					@obj.Name
+				</td>
+				<td width="40%">
+					@obj.DisplayOrder
+				</td>
+				<td>
+					<div class="w-70 btn-group" role="group">
+						@*asp-route-.. can be different, id is my parameter*@
+						<a asp-controller="Category" asp-action="Edit" asp-route-id="@obj.Id"
+					   class="btn btn-primary mx-2"> <i class="bi bi-pen"></i> Edit</a>
+					</div>
+					<div class="w-70 btn-group" role="group">
+						@*asp-route-.. can be different, id is my parameter*@
+						<a asp-controller="Category" asp-action="Delete" asp-route-id="@obj.Id"
+					   class="btn btn-danger mx-2"> <i class="bi bi-trash3-fill"></i> Delete</a>
+					</div>
+				</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
