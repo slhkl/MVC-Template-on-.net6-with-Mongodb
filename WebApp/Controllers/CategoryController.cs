@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using WebApp.Models;
 using WebApp.Services;
 
@@ -6,21 +7,17 @@ namespace WebApp.Controllers
 {
     public class CategoryController : Controller
     {
-        private IConfiguration _configuration;
         private CategoryServices _categoryServices;
-        public CategoryController(IConfiguration iConfig)
+
+        public CategoryController(IOptions<DatabaseSetting> databaseSettingsFromAppSettings)
         {
-            _configuration = iConfig;
-            DatabaseSetting databaseSetting = new DatabaseSetting(GetValue("ConnectionString"), GetValue("DatabaseName"), GetValue("CollectionName"));
-            _categoryServices = new CategoryServices(databaseSetting);
+            _categoryServices = new CategoryServices(databaseSettingsFromAppSettings.Value);
         }
-        public string GetValue(string s)
+
+        [ActionName("Index")]
+        public async Task<IActionResult> IndexAsync()
         {
-            return _configuration.GetValue<string>("DatabaseSetting:" + s);
-        }
-        public IActionResult Index()
-        {
-            List<Category>? list = _categoryServices.Get().Result;
+            List<Category>? list = await _categoryServices.Get();
             return View(list);
         }
 
@@ -31,9 +28,9 @@ namespace WebApp.Controllers
         }
 
         //Post
-        [HttpPost]
+        [HttpPost, ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Category obj)
+        public async Task<IActionResult> CreateAsync(Category obj)
         {
             if (obj.DisplayOrder.ToString() == obj.Name)
             {
@@ -43,7 +40,7 @@ namespace WebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                _categoryServices.Create(obj).Wait();
+                await _categoryServices.Create(obj);
                 TempData["success"] = "Category created succesfuly";
                 return RedirectToAction("Index");
             }
@@ -51,14 +48,15 @@ namespace WebApp.Controllers
         }
 
         //Get
-        public IActionResult Edit(string? id)
+        [ActionName("Edit")]
+        public async Task<IActionResult> EditAsync(string? id)
         {
             if (String.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
 
-            Category categoryFromDb = _categoryServices.Get(id).Result;
+            Category categoryFromDb = await _categoryServices.Get(id);
             if (categoryFromDb == null)
             {
                 return NotFound();
@@ -68,9 +66,9 @@ namespace WebApp.Controllers
         }
 
         //Post
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Category obj)
+        public async Task<IActionResult> EditAsync(Category obj)
         {
             if (obj.DisplayOrder.ToString() == obj.Name)
             {
@@ -80,7 +78,7 @@ namespace WebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                _categoryServices.Update(obj.Id, obj).Wait();
+                await _categoryServices.Update(obj);
                 TempData["success"] = "Category updated succesfuly";
                 return RedirectToAction("Index");
             }
@@ -88,14 +86,15 @@ namespace WebApp.Controllers
         }
 
         //Get
-        public IActionResult Delete(string? id)
+        [ActionName("Delete")]
+        public async Task<IActionResult> DeleteAsync(string? id)
         {
             if (String.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
 
-            Category categoryFromDb = _categoryServices.Get(id).Result;
+            Category categoryFromDb = await _categoryServices.Get(id);
             if (categoryFromDb == null)
             {
                 return NotFound();
@@ -107,15 +106,15 @@ namespace WebApp.Controllers
         //Post
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeletePost(string id)
+        public async Task<IActionResult> DeletePostAsync(string id)
         {
-            Category categoryFromDb = _categoryServices.Get(id).Result;
+            Category categoryFromDb = await _categoryServices.Get(id);
             if (categoryFromDb == null)
             {
                 return NotFound();
             }
 
-            _categoryServices.Delete(id).Wait();
+            await _categoryServices.Delete(id);
             TempData["success"] = "Category deleted succesfuly";
             return RedirectToAction("Index");
         }

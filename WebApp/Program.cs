@@ -3,6 +3,7 @@ using WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<DatabaseSetting>(builder.Configuration.GetSection("DatabaseSetting"));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

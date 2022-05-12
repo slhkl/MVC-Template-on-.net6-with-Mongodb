@@ -20,7 +20,7 @@ namespace WebApp.Services
 
         public async Task Create(Category category) => await _categories.InsertOneAsync(category);
 
-        public async Task Update(string id, Category updateCategory) => await _categories.ReplaceOneAsync(x => x.Id == id, updateCategory);
+        public async Task Update(Category updateCategory) => await _categories.ReplaceOneAsync(x => x.Id == updateCategory.Id, updateCategory);
 
         public async Task Delete(string id) => await _categories.FindOneAndDeleteAsync(x => x.Id == id);
     }
